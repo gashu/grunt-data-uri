@@ -35,7 +35,11 @@ module.exports = function(grunt) {
 
       if (!matches) {
         grunt.log.subhead('file uri not found on '+src);
-        grunt.log.ok('Skipped');
+        //output without change
+        grunt.file.setBase(baseGrunt);
+        grunt.file.write(outputTo, content);
+        grunt.log.ok('output without change');
+        grunt.log.ok('=> ' + outputTo);
         return;
       }
 
