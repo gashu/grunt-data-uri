@@ -93,24 +93,42 @@ module.exports = function(grunt) {
    * @return {String} resolvedPath
    */
   function adjustDirectoryLevel(relativePath, toDir, fromDir) {
-    var resolvedPath = relativePath;
+    var resolvedPath = relativePath,
+        toDepth = getDepth(toDir),
+        fromDepth = getDepth(fromDir);
 
-    if (toDir === fromDir) {
+    var depthDiff = fromDepth - toDepth;
+
+    if (depthDiff === 0) {
       // both toDir and fromDir are same base.
-    }
-    else if (fromDir.indexOf(toDir) === 0) {
+      return resolvedPath;
+    } else if (depthDiff > 0) {
       // fromDir is shallow than toDir
-      path.relative(fromDir, toDir).split('/').forEach(function() {
+      for (var n = 0; depthDiff > n; n++) {
         resolvedPath = resolvedPath.replace(/^\.\.\//, '');
-      });
-    }
-    else if (toDir.indexOf(fromDir) === 0 ) {
-      // toDir is depp than fromDir
-      path.relative(fromDir, toDir).split('/').forEach(function() {
+      }
+    } else if (depthDiff < 0) {
+      // toDir is deep than fromDir
+      depthDiff =-depthDiff;
+      for (var i = 0; depthDiff > i; i++) {
         resolvedPath = '../'+resolvedPath;
-      });
+      }
     }
     return resolvedPath;
+  }
+
+  /**
+   * @method getDepth
+   * @param {String} path
+   * @return {Integer} dep
+   */
+  function getDepth(path) {
+    var sep = 0;
+    for(var dep = 0; (sep = path.indexOf("/")) !== -1; dep++){
+      var tmp = path.slice(sep + 1, path.length);
+      path = tmp;
+    }
+    return dep;
   }
 
 };
